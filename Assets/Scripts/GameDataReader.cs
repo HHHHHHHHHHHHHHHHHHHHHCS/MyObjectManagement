@@ -17,7 +17,7 @@ public class GameDataReader
         return reader.ReadSingle();
     }
 
-    public float ReadInt()
+    public int ReadInt()
     {
         return reader.ReadInt32();
     }

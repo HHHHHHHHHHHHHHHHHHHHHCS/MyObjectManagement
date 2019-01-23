@@ -3,30 +3,32 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class Game : MonoBehaviour
+public class Game : PersistableObject
 {
-    public Transform prefab;
+    private const int saveVersion = 1;
+    private const int version_1 = 1; //版本1储存的是shapeId
+
+
+    public ShapeFactory shapeFacotry;
+    public PersistenStorage storage;
 
     public KeyCode createKey = KeyCode.C;
     public KeyCode newGameKey = KeyCode.N;
     public KeyCode saveKey = KeyCode.S;
     public KeyCode loadKey = KeyCode.L;
 
-    private List<Transform> objects;
-
-    private string savePath;
+    private List<Shape> shapes;
 
     private void Awake()
     {
-        objects = new List<Transform>();
-        savePath = Path.Combine(Application.dataPath + "/..", "SaveFile.save");
+        shapes = new List<Shape>();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(createKey))
         {
-            CreateObject();
+            CreateShape();
         }
         else if (Input.GetKeyDown(newGameKey))
         {
@@ -34,65 +36,72 @@ public class Game : MonoBehaviour
         }
         else if (Input.GetKeyDown(saveKey))
         {
-            Save();
+            storage.Save(this);
         }
         else if (Input.GetKeyDown(loadKey))
         {
-            Load();
+            BeginNewGame();
+            storage.Load(this);
         }
     }
 
 
-    private void CreateObject()
+    private void CreateShape()
     {
-        Transform t = Instantiate(prefab);
+        Shape instance = shapeFacotry.GetRandom();
+        Transform t = instance.transform;
         t.localPosition = Random.insideUnitSphere * 5f;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
-        objects.Add(t);
+        shapes.Add(instance);
     }
 
     private void BeginNewGame()
     {
-        foreach (var obj in objects)
+        foreach (var obj in shapes)
         {
             Destroy(obj.gameObject);
         }
 
-        objects.Clear();
+        shapes.Clear();
     }
 
-    private void Save()
+
+    public override void Save(GameDataWriter writer)
     {
-        using (var writer = new BinaryWriter(
-            File.Open(savePath, FileMode.Create)))
+        writer.Write(-saveVersion); //之前没有储存版本,新加储存版本用符号防止意外
+        writer.Write(shapes.Count);
+        foreach (var item in shapes)
         {
-            writer.Write(objects.Count);
-            foreach (var obj in objects)
-            {
-                writer.Write(obj.localPosition.x);
-                writer.Write(obj.localPosition.y);
-                writer.Write(obj.localPosition.z);
-            }
+            writer.Write(item.ShapeId);
+            item.Save(writer);
         }
     }
 
-    private void Load()
+
+    public override void Load(GameDataReader reader)
     {
-        BeginNewGame();
-        using (var reader = new BinaryReader(File.Open(savePath, FileMode.Open)))
+        int version = -reader.ReadInt();
+        if (version > saveVersion)
         {
-            int count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
+            //防止版本错误
+            Debug.LogError("Unsupported future save version " + version);
+            return;
+        }
+
+        //之前没有储存版本,现在加了,所以用负号,
+        int count = version <= 0 ? -version : reader.ReadInt();
+        for (int i = 0; i < count; i++)
+        {
+            int shapedId = 0;
+            if (version >= version_1)
             {
-                Vector3 p;
-                p.x = reader.ReadSingle();
-                p.y = reader.ReadSingle();
-                p.z = reader.ReadSingle();
-                Transform t = Instantiate(prefab);
-                t.localPosition = p;
-                objects.Add(t);
+                shapedId = reader.ReadInt();
             }
+
+            Shape instance = shapeFacotry.Get(shapedId);
+            instance.Load(reader);
+            shapes.Add(instance);
         }
     }
 }
