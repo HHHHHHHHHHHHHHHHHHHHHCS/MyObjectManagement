@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class GameDataWriter 
+public class GameDataWriter
 {
     private BinaryWriter writer;
 
@@ -35,5 +35,13 @@ public class GameDataWriter
         writer.Write(value.y);
         writer.Write(value.z);
         writer.Write(value.w);
+    }
+
+    public void Write(Color color)
+    {
+        writer.Write(color.r);
+        writer.Write(color.g);
+        writer.Write(color.b);
+        writer.Write(color.a);
     }
 }

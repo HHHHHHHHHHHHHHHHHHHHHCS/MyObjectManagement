@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class GameDataReader 
+public class GameDataReader
 {
+    public int Version { get; }
+
     private BinaryReader reader;
 
-    public GameDataReader(BinaryReader br)
+    public GameDataReader(BinaryReader br,int version)
     {
         reader = br;
+        Version = version;
     }
 
     public float ReadFloat()
@@ -38,6 +41,16 @@ public class GameDataReader
         value.x = reader.ReadSingle();
         value.y = reader.ReadSingle();
         value.z = reader.ReadSingle();
+        return value;
+    }
+
+    public Color ReadColor()
+    {
+        Color value;
+        value.r = reader.ReadSingle();
+        value.g = reader.ReadSingle();
+        value.b = reader.ReadSingle();
+        value.a = reader.ReadSingle();
         return value;
     }
 }

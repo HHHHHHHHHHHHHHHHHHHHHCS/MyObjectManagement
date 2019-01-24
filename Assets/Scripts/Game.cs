@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class Game : PersistableObject
 {
-    private const int saveVersion = 1;
-    private const int version_1 = 1; //版本1储存的是shapeId
-
+    public const int nowSaveVersion = 3;
+    public const int version_1 = 1; //版本1储存的是shape的shapeId
+    public const int version_2 = 2; //版本2储存的是shape的materialId
+    public const int version_3 = 3; //版本3储存的是shape的颜色
 
     public ShapeFactory shapeFacotry;
     public PersistenStorage storage;
@@ -36,7 +37,7 @@ public class Game : PersistableObject
         }
         else if (Input.GetKeyDown(saveKey))
         {
-            storage.Save(this);
+            storage.Save(this, nowSaveVersion);
         }
         else if (Input.GetKeyDown(loadKey))
         {
@@ -53,6 +54,11 @@ public class Game : PersistableObject
         t.localPosition = Random.insideUnitSphere * 5f;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
+        instance.SetColor(Random.ColorHSV(
+            hueMin: 0, hueMax: 1
+            , saturationMin: 0.5f, saturationMax: 1
+            , valueMin: 0.25f, valueMax: 1
+            , alphaMin: 1, alphaMax: 1));
         shapes.Add(instance);
     }
 
@@ -69,11 +75,11 @@ public class Game : PersistableObject
 
     public override void Save(GameDataWriter writer)
     {
-        writer.Write(-saveVersion); //之前没有储存版本,新加储存版本用符号防止意外
         writer.Write(shapes.Count);
         foreach (var item in shapes)
         {
             writer.Write(item.ShapeId);
+            writer.Write(item.MaterialId);
             item.Save(writer);
         }
     }
@@ -81,8 +87,8 @@ public class Game : PersistableObject
 
     public override void Load(GameDataReader reader)
     {
-        int version = -reader.ReadInt();
-        if (version > saveVersion)
+        int version = reader.Version;
+        if (version > nowSaveVersion)
         {
             //防止版本错误
             Debug.LogError("Unsupported future save version " + version);
@@ -93,13 +99,9 @@ public class Game : PersistableObject
         int count = version <= 0 ? -version : reader.ReadInt();
         for (int i = 0; i < count; i++)
         {
-            int shapedId = 0;
-            if (version >= version_1)
-            {
-                shapedId = reader.ReadInt();
-            }
-
-            Shape instance = shapeFacotry.Get(shapedId);
+            int shapedId = version >= version_1 ? reader.ReadInt() : 0;
+            int materialId = version >= version_2 ? reader.ReadInt() : 0;
+            Shape instance = shapeFacotry.Get(shapedId, materialId);
             instance.Load(reader);
             shapes.Add(instance);
         }
