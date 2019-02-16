@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [CreateAssetMenu]
 public class ShapeFactory : ScriptableObject
@@ -10,6 +11,8 @@ public class ShapeFactory : ScriptableObject
     [SerializeField] private bool recycle;
 
     private List<Shape>[] pools;
+
+    private Scene poolScene;
 
     public Shape Get(int shapeId = 0, int materialId = 0)
     {
@@ -35,9 +38,9 @@ public class ShapeFactory : ScriptableObject
         {
             instance = Instantiate(prefabs[shapeId]);
             instance.ShapeId = shapeId;
-
         }
 
+        SceneManager.MoveGameObjectToScene(instance.gameObject, poolScene);
         instance.SetMaterial(materials[materialId], materialId);
         return instance;
     }
@@ -74,5 +77,26 @@ public class ShapeFactory : ScriptableObject
         {
             pools[i] = new List<Shape>();
         }
+
+#if UNITY_EDITOR
+        //首先是只在Editor下使用,因为Editor下,场景的缓存不一定清除的掉,直接进行回收处理
+        //接着Scene是一个struct,所以只能用GetSceneByName再isLoaded
+        poolScene = SceneManager.GetSceneByName(name);
+        if (poolScene.isLoaded)
+        {
+            GameObject[] rootObjects = poolScene.GetRootGameObjects();
+            for (int i = 0; i < rootObjects.Length; i++)
+            {
+                Shape pooledShape = rootObjects[i].GetComponent<Shape>();
+                if (!pooledShape.gameObject.activeSelf)
+                {
+                    pools[pooledShape.ShapeId].Add(pooledShape);
+                }
+            }
+            return;
+        }
+#endif
+
+        poolScene = SceneManager.CreateScene(name);
     }
 }
