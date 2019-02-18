@@ -40,7 +40,11 @@ public class ShapeFactory : ScriptableObject
             instance.ShapeId = shapeId;
         }
 
-        SceneManager.MoveGameObjectToScene(instance.gameObject, poolScene);
+        if (recycle)
+        {
+            SceneManager.MoveGameObjectToScene(instance.gameObject, poolScene);
+        }
+
         instance.SetMaterial(materials[materialId], materialId);
         return instance;
     }

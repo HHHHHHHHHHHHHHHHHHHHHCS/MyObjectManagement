@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Game : PersistableObject
 {
@@ -20,13 +21,15 @@ public class Game : PersistableObject
         }
     }
 
-    public const int nowSaveVersion = 3;
+    public const int nowSaveVersion = 4;
     public const int version_1 = 1; //版本1储存的是shape的shapeId
     public const int version_2 = 2; //版本2储存的是shape的materialId
     public const int version_3 = 3; //版本3储存的是shape的颜色
+    public const int version_4 = 4; //版本4储存的是loadedLevelBuildIndex
 
     public ShapeFactory shapeFacotry;
     public PersistenStorage storage;
+    public int levelCount;
 
     public KeyCode createKey = KeyCode.C;
     public KeyCode destoryKey = KeyCode.X;
@@ -41,9 +44,30 @@ public class Game : PersistableObject
     private float destructionSpeed;
     private float destructionProgress;
 
-    private void Awake()
+    private int loadedLevelBuildIndex;//当前加载的场景的BuildIndex
+
+    /// <summary>
+    /// 为什么用start,因为Awake的时候一些东西还没有准备就绪
+    /// </summary>
+    private void Start()
     {
         shapes = new List<Shape>();
+
+#if UNITY_EDITOR
+        //只有在Editor的情况下 一开始就有场景叠加
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene loadedScene = SceneManager.GetSceneAt(i);
+            if (loadedScene.name.Contains("Level"))
+            {
+                SceneManager.SetActiveScene(loadedScene);
+                loadedLevelBuildIndex = loadedScene.buildIndex;
+                return;
+            }
+        }
+#endif
+
+        StartCoroutine(LoadLevel(1));
     }
 
     private void Update()
@@ -68,6 +92,18 @@ public class Game : PersistableObject
         {
             BeginNewGame();
             storage.Load(this);
+        }
+        else
+        {
+            for (int i = 1; i <= levelCount; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha0 + i))
+                {
+                    BeginNewGame();
+                    StartCoroutine(LoadLevel(i));
+                    return;
+                }
+            }
         }
 
         creationProgress += Time.deltaTime * creationSpeed;
@@ -121,7 +157,6 @@ public class Game : PersistableObject
             shapes[index] = shapes[lastIndex];
             shapes.RemoveAt(lastIndex);
         }
-
     }
 
     private void BeginNewGame()
@@ -138,6 +173,7 @@ public class Game : PersistableObject
     public override void Save(GameDataWriter writer)
     {
         writer.Write(shapes.Count);
+        writer.Write(loadedLevelBuildIndex);
         foreach (var item in shapes)
         {
             writer.Write(item.ShapeId);
@@ -159,6 +195,7 @@ public class Game : PersistableObject
 
         //之前没有储存版本,现在加了,所以用负号,
         int count = version <= 0 ? -version : reader.ReadInt();
+        StartCoroutine(LoadLevel(version < version_4 ? 1 : reader.ReadInt()));
         for (int i = 0; i < count; i++)
         {
             int shapedId = version >= version_1 ? reader.ReadInt() : 0;
@@ -167,5 +204,18 @@ public class Game : PersistableObject
             instance.Load(reader);
             shapes.Add(instance);
         }
+    }
+
+    private IEnumerator LoadLevel(int levelBuildIndex)
+    {
+        enabled = false;
+        if (loadedLevelBuildIndex > 0)
+        {
+            yield return SceneManager.UnloadSceneAsync(loadedLevelBuildIndex);
+        }
+        yield return SceneManager.LoadSceneAsync(levelBuildIndex, LoadSceneMode.Additive);
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(levelBuildIndex));
+        loadedLevelBuildIndex = levelBuildIndex;
+        enabled = true;
     }
 }
