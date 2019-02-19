@@ -27,7 +27,8 @@ public class Game : PersistableObject
     public const int version_3 = 3; //版本3储存的是shape的颜色
     public const int version_4 = 4; //版本4储存的是loadedLevelBuildIndex
 
-    public ShapeFactory shapeFacotry;
+    [SerializeField]
+    private ShapeFactory shapeFactory;
     public PersistenStorage storage;
     public int levelCount;
 
@@ -37,6 +38,7 @@ public class Game : PersistableObject
     public KeyCode saveKey = KeyCode.S;
     public KeyCode loadKey = KeyCode.L;
 
+
     private List<Shape> shapes;
 
     private float creationSpeed;
@@ -45,6 +47,15 @@ public class Game : PersistableObject
     private float destructionProgress;
 
     private int loadedLevelBuildIndex;//当前加载的场景的BuildIndex
+
+    public SpawnZone SpawnZoneOfLevel { get; set; }
+
+
+    private void Awake()
+    {
+        SpawnZoneOfLevel = GameObject.Find("SpawnZoneOfLevel").GetComponent<SpawnZone>();
+    }
+
 
     /// <summary>
     /// 为什么用start,因为Awake的时候一些东西还没有准备就绪
@@ -134,9 +145,9 @@ public class Game : PersistableObject
 
     private void CreateShape()
     {
-        Shape instance = shapeFacotry.GetRandom();
+        Shape instance = shapeFactory.GetRandom();
         Transform t = instance.transform;
-        t.localPosition = Random.insideUnitSphere * 5f;
+        t.localPosition = SpawnZoneOfLevel.SpawnPoint;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
         instance.SetColor(Random.ColorHSV(
@@ -152,7 +163,7 @@ public class Game : PersistableObject
         if (shapes.Count > 0)
         {
             int index = Random.Range(0, shapes.Count);
-            shapeFacotry.Reclaim(shapes[index]);
+            shapeFactory.Reclaim(shapes[index]);
             int lastIndex = shapes.Count - 1;
             shapes[index] = shapes[lastIndex];
             shapes.RemoveAt(lastIndex);
@@ -163,7 +174,7 @@ public class Game : PersistableObject
     {
         foreach (var obj in shapes)
         {
-            shapeFacotry.Reclaim(obj);
+            shapeFactory.Reclaim(obj);
         }
 
         shapes.Clear();
@@ -200,7 +211,7 @@ public class Game : PersistableObject
         {
             int shapedId = version >= version_1 ? reader.ReadInt() : 0;
             int materialId = version >= version_2 ? reader.ReadInt() : 0;
-            Shape instance = shapeFacotry.Get(shapedId, materialId);
+            Shape instance = shapeFactory.Get(shapedId, materialId);
             instance.Load(reader);
             shapes.Add(instance);
         }
