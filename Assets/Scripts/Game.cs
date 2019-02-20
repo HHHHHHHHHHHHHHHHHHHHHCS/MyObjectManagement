@@ -30,7 +30,6 @@ public class Game : PersistableObject
     [SerializeField]
     private ShapeFactory shapeFactory;
     public PersistenStorage storage;
-    public int levelCount;
 
     public KeyCode createKey = KeyCode.C;
     public KeyCode destoryKey = KeyCode.X;
@@ -46,6 +45,7 @@ public class Game : PersistableObject
     private float destructionSpeed;
     private float destructionProgress;
 
+    private int levelCount;
     private int loadedLevelBuildIndex;//当前加载的场景的BuildIndex
 
     public SpawnZone SpawnZoneOfLevel { get; set; }
@@ -53,7 +53,6 @@ public class Game : PersistableObject
 
     private void Awake()
     {
-        SpawnZoneOfLevel = GameObject.Find("SpawnZoneOfLevel").GetComponent<SpawnZone>();
     }
 
 
@@ -63,6 +62,8 @@ public class Game : PersistableObject
     private void Start()
     {
         shapes = new List<Shape>();
+
+        levelCount = SceneManager.sceneCountInBuildSettings - 1;//这里暂时暂时只用排除主场景
 
 #if UNITY_EDITOR
         //只有在Editor的情况下 一开始就有场景叠加

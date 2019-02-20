@@ -261,10 +261,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_GeneratorAsset: {fileID: 0}
-  m_Script: {fileID: 11500000, guid: 2ac3ec0a24ce6a843a4ef70b6028cf7d, type: 3}
+  m_Script: {fileID: 11500000, guid: baf3bbc5d24ebee488ecd6a2993c4e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceOnly: 0
 --- !u!4 &687227935
 Transform:
   m_ObjectHideFlags: 0
