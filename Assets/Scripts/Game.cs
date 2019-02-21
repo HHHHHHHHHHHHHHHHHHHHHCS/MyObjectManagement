@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Game : PersistableObject
 {
+    /*
     private static Game instance;
 
     public static Game Instance
@@ -20,16 +21,19 @@ public class Game : PersistableObject
             return instance;
         }
     }
+    */
 
-    public const int nowSaveVersion = 4;
+
+    public const int nowSaveVersion = 5;
     public const int version_1 = 1; //版本1储存的是shape的shapeId
     public const int version_2 = 2; //版本2储存的是shape的materialId
     public const int version_3 = 3; //版本3储存的是shape的颜色
     public const int version_4 = 4; //版本4储存的是loadedLevelBuildIndex
+    public const int version_5 = 5; //版本5储存的是生成的随机数种子
 
-    [SerializeField]
-    private ShapeFactory shapeFactory;
+    [SerializeField] private ShapeFactory shapeFactory;
     public PersistenStorage storage;
+    [SerializeField] private bool reSeedOnLoad;
 
     public KeyCode createKey = KeyCode.C;
     public KeyCode destoryKey = KeyCode.X;
@@ -46,10 +50,9 @@ public class Game : PersistableObject
     private float destructionProgress;
 
     private int levelCount;
-    private int loadedLevelBuildIndex;//当前加载的场景的BuildIndex
+    private int loadedLevelBuildIndex; //当前加载的场景的BuildIndex
 
-    public SpawnZone SpawnZoneOfLevel { get; set; }
-
+    private Random.State mainRandomState;
 
     private void Awake()
     {
@@ -63,7 +66,9 @@ public class Game : PersistableObject
     {
         shapes = new List<Shape>();
 
-        levelCount = SceneManager.sceneCountInBuildSettings - 1;//这里暂时暂时只用排除主场景
+        mainRandomState = Random.state;
+
+        levelCount = SceneManager.sceneCountInBuildSettings - 1; //这里暂时暂时只用排除主场景
 
 #if UNITY_EDITOR
         //只有在Editor的情况下 一开始就有场景叠加
@@ -79,6 +84,7 @@ public class Game : PersistableObject
         }
 #endif
 
+        BeginNewGame();
         StartCoroutine(LoadLevel(1));
     }
 
@@ -148,7 +154,7 @@ public class Game : PersistableObject
     {
         Shape instance = shapeFactory.GetRandom();
         Transform t = instance.transform;
-        t.localPosition = SpawnZoneOfLevel.SpawnPoint;
+        t.localPosition = GameLevel.Current.SpawnPoint;
         t.localRotation = Random.rotation;
         t.localScale = Vector3.one * Random.Range(0.1f, 1f);
         instance.SetColor(Random.ColorHSV(
@@ -173,6 +179,12 @@ public class Game : PersistableObject
 
     private void BeginNewGame()
     {
+        Random.state = mainRandomState;
+        //这样能是种子更难被预测
+        int seed = Random.Range(0, int.MaxValue) ^ (int) Time.unscaledTime;
+        mainRandomState = Random.state;
+        Random.InitState(seed);
+
         foreach (var obj in shapes)
         {
             shapeFactory.Reclaim(obj);
@@ -185,7 +197,9 @@ public class Game : PersistableObject
     public override void Save(GameDataWriter writer)
     {
         writer.Write(shapes.Count);
+        writer.Write(Random.state);
         writer.Write(loadedLevelBuildIndex);
+        GameLevel.Current.Save(writer);
         foreach (var item in shapes)
         {
             writer.Write(item.ShapeId);
@@ -205,9 +219,30 @@ public class Game : PersistableObject
             return;
         }
 
+        StartCoroutine(LoadGame(reader));
+    }
+
+    private IEnumerator LoadGame(GameDataReader reader)
+    {
+        int version = reader.Version;
         //之前没有储存版本,现在加了,所以用负号,
         int count = version <= 0 ? -version : reader.ReadInt();
-        StartCoroutine(LoadLevel(version < version_4 ? 1 : reader.ReadInt()));
+
+        if (version >= version_5)
+        {
+            Random.State state = reader.ReadRandomState();
+            if (!reSeedOnLoad)
+            {
+                Random.state = state;
+            }
+        }
+
+        yield return LoadLevel(version<version_4?1:reader.ReadInt());
+        if (version >= version_5)
+        {
+            GameLevel.Current.Load(reader);
+        }
+
         for (int i = 0; i < count; i++)
         {
             int shapedId = version >= version_1 ? reader.ReadInt() : 0;
@@ -225,6 +260,7 @@ public class Game : PersistableObject
         {
             yield return SceneManager.UnloadSceneAsync(loadedLevelBuildIndex);
         }
+
         yield return SceneManager.LoadSceneAsync(levelBuildIndex, LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(levelBuildIndex));
         loadedLevelBuildIndex = levelBuildIndex;

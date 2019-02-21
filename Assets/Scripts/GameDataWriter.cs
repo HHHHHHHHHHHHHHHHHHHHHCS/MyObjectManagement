@@ -44,4 +44,12 @@ public class GameDataWriter
         writer.Write(color.b);
         writer.Write(color.a);
     }
+
+    public void Write(Random.State value)
+    {
+        //因为Random.state 是四位浮点数,并且我们无法公共的访问
+        //但是可以通过json 来实现
+        //Debug.Log(JsonUtility.ToJson(value));
+        writer.Write(JsonUtility.ToJson(value));
+    }
 }
