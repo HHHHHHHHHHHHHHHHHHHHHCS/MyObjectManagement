@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Game : PersistableObject
 {
-    /*
+
     private static Game instance;
 
     public static Game Instance
@@ -21,15 +21,15 @@ public class Game : PersistableObject
             return instance;
         }
     }
-    */
 
 
-    public const int nowSaveVersion = 5;
+    public const int nowSaveVersion = 6;
     public const int version_1 = 1; //版本1储存的是shape的shapeId
     public const int version_2 = 2; //版本2储存的是shape的materialId
     public const int version_3 = 3; //版本3储存的是shape的颜色
     public const int version_4 = 4; //版本4储存的是loadedLevelBuildIndex
     public const int version_5 = 5; //版本5储存的是生成的随机数种子
+    public const int version_6 = 6; //版本6储存的是生成毁灭的速度和进度
 
     [SerializeField] private ShapeFactory shapeFactory;
     public PersistenStorage storage;
@@ -101,6 +101,7 @@ public class Game : PersistableObject
         else if (Input.GetKeyDown(newGameKey))
         {
             BeginNewGame();
+            StartCoroutine(LoadLevel(loadedLevelBuildIndex));
         }
         else if (Input.GetKeyDown(saveKey))
         {
@@ -123,7 +124,10 @@ public class Game : PersistableObject
                 }
             }
         }
+    }
 
+    private void FixedUpdate()
+    {
         creationProgress += Time.deltaTime * creationSpeed;
         while (creationProgress >= 1)
         {
@@ -185,6 +189,11 @@ public class Game : PersistableObject
         mainRandomState = Random.state;
         Random.InitState(seed);
 
+        creationSpeed = 0;
+        UIManager.Instance.SetCreationSpeedValue(creationSpeed);
+        destructionSpeed = 0;
+        UIManager.Instance.SetDestructionSpeedValue(destructionSpeed);
+
         foreach (var obj in shapes)
         {
             shapeFactory.Reclaim(obj);
@@ -198,6 +207,10 @@ public class Game : PersistableObject
     {
         writer.Write(shapes.Count);
         writer.Write(Random.state);
+        writer.Write(creationSpeed);
+        writer.Write(creationProgress);
+        writer.Write(destructionSpeed);
+        writer.Write(destructionProgress);
         writer.Write(loadedLevelBuildIndex);
         GameLevel.Current.Save(writer);
         foreach (var item in shapes)
@@ -235,7 +248,19 @@ public class Game : PersistableObject
             {
                 Random.state = state;
             }
+
         }
+
+        if (version >= version_6)
+        {
+            creationSpeed = reader.ReadFloat();
+            creationProgress = reader.ReadFloat();
+            UIManager.Instance.SetCreationSpeedValue(creationSpeed);
+            destructionSpeed = reader.ReadFloat();
+            destructionProgress = reader.ReadFloat();
+            UIManager.Instance.SetDestructionSpeedValue(destructionSpeed);
+        }
+
 
         yield return LoadLevel(version<version_4?1:reader.ReadInt());
         if (version >= version_5)

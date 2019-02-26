@@ -20,14 +20,26 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private Slider creationSpeedSlider;
+    private Slider destructionSpeedSlider;
 
     private void Awake()
     {
         Transform root = transform;
-        Slider creationSpeedSlider = root.Find("CreationSpeedSlider").GetComponent<Slider>();
-        Slider destructionSpeedSlider = root.Find("DestructionSpeedSlider").GetComponent<Slider>();
+        creationSpeedSlider = root.Find("CreationSpeedSlider").GetComponent<Slider>();
+        destructionSpeedSlider = root.Find("DestructionSpeedSlider").GetComponent<Slider>();
 
         creationSpeedSlider.onValueChanged.AddListener(Game.Instance.ChangeCreationSpeed);
         destructionSpeedSlider.onValueChanged.AddListener(Game.Instance.ChangeDestructionSpeed);
+    }
+
+    public void SetCreationSpeedValue(float val)
+    {
+        creationSpeedSlider.value = val;
+    }
+
+    public void SetDestructionSpeedValue(float val)
+    {
+        destructionSpeedSlider.value = val;
     }
 }

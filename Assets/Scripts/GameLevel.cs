@@ -8,25 +8,45 @@ public class GameLevel : PersistableObject
 
     public Vector3 SpawnPoint => spawanZone.SpawnPoint;
 
+    [SerializeField]
     private SpawnZone spawanZone;
+
+    [SerializeField]
+    private PersistableObject[] persistableObjects;
+
 
     private void Start()
     {
-        spawanZone = GameObject.Find("SpawnZone").GetComponent<SpawnZone>();
+        if (spawanZone == null)
+        {
+            spawanZone = GameObject.Find("SpawnZone").GetComponent<SpawnZone>();
+        }
     }
 
     private void OnEnable()
     {
         Current = this;
+        if (persistableObjects == null)
+        {
+            persistableObjects = new PersistableObject[0];
+        }
     }
 
     public override void Save(GameDataWriter writer)
     {
-        base.Save(writer);
+        writer.Write(persistableObjects.Length);
+        for (int i = 0; i < persistableObjects.Length; i++)
+        {
+            persistableObjects[i].Save(writer);
+        }
     }
 
     public override void Load(GameDataReader reader)
     {
-        base.Load(reader);
+        int saveCount = reader.ReadInt();
+        for (int i = 0; i < saveCount; i++)
+        {
+            persistableObjects[i].Load(reader);
+        }
     }
 }
