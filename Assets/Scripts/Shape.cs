@@ -7,11 +7,14 @@ public class Shape : PersistableObject
     private static readonly int colorPropertyId = Shader.PropertyToID("_Color");
     private static  MaterialPropertyBlock shaderPropertyBlock;
 
-    private MeshRenderer meshRenderer;
 
+    private MeshRenderer meshRenderer;
     private int shapeId = int.MinValue;
 
     public int MaterialId { get; private set; }
+    public Vector3 AngularVelocity { get; set; }
+    public Vector3 Velocity { get; set; }
+
 
     private Color color;
 
@@ -36,6 +39,12 @@ public class Shape : PersistableObject
         meshRenderer = GetComponent<MeshRenderer>();
     }
 
+    public void GameUpdate()
+    {
+        transform.Rotate(AngularVelocity * Time.fixedDeltaTime);
+        transform.localPosition += Velocity * Time.fixedDeltaTime;
+    }
+
     public void SetMaterial(Material material, int materialId)
     {
         meshRenderer.material = material;
@@ -57,11 +66,15 @@ public class Shape : PersistableObject
     {
         base.Save(writer);
         writer.Write(color);
+        writer.Write(AngularVelocity);
+        writer.Write(Velocity);
     }
 
     public override void Load(GameDataReader reader)
     {
         base.Load(reader);
         SetColor(reader.Version >= Game.version_3 ? reader.ReadColor() : Color.white);
+        AngularVelocity = reader.Version >= Game.version_7 ? reader.ReadVector3() : Vector3.zero;
+        Velocity = reader.Version >= 4 ? reader.ReadVector3() : Vector3.zero;
     }
 }

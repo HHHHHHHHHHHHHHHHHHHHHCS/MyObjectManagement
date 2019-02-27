@@ -22,14 +22,16 @@ public class Game : PersistableObject
         }
     }
 
-
-    public const int nowSaveVersion = 6;
+    #region version
+    public const int nowSaveVersion = 7;
     public const int version_1 = 1; //版本1储存的是shape的shapeId
     public const int version_2 = 2; //版本2储存的是shape的materialId
     public const int version_3 = 3; //版本3储存的是shape的颜色
     public const int version_4 = 4; //版本4储存的是loadedLevelBuildIndex
     public const int version_5 = 5; //版本5储存的是生成的随机数种子
     public const int version_6 = 6; //版本6储存的是生成毁灭的速度和进度
+    public const int version_7 = 7; //版本7储存的是物体的旋转速度和运动速度
+    #endregion
 
     [SerializeField] private ShapeFactory shapeFactory;
     public PersistenStorage storage;
@@ -128,6 +130,11 @@ public class Game : PersistableObject
 
     private void FixedUpdate()
     {
+        foreach (var item in shapes)
+        {
+            item.GameUpdate();
+        }
+
         creationProgress += Time.deltaTime * creationSpeed;
         while (creationProgress >= 1)
         {
@@ -157,15 +164,7 @@ public class Game : PersistableObject
     private void CreateShape()
     {
         Shape instance = shapeFactory.GetRandom();
-        Transform t = instance.transform;
-        t.localPosition = GameLevel.Current.SpawnPoint;
-        t.localRotation = Random.rotation;
-        t.localScale = Vector3.one * Random.Range(0.1f, 1f);
-        instance.SetColor(Random.ColorHSV(
-            hueMin: 0, hueMax: 1
-            , saturationMin: 0.5f, saturationMax: 1
-            , valueMin: 0.25f, valueMax: 1
-            , alphaMin: 1, alphaMax: 1));
+        GameLevel.Current.ConfigureSpawn(instance);
         shapes.Add(instance);
     }
 
