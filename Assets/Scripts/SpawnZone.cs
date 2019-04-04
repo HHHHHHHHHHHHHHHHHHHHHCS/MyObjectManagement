@@ -19,10 +19,12 @@ public abstract class SpawnZone : PersistableObject
 
         public SpawnMovementDirection spawnMovementDirection;
         public FloatRange spawnSpeed;
+        public FloatRange angularSpeed;
+        public FloatRange scale;
+        public ColorRangeHSV color;
     }
 
-    [SerializeField]
-    private SpawnConfiguration spawnConfig;
+    [SerializeField] private SpawnConfiguration spawnConfig;
 
     public abstract Vector3 SpawnPoint { get; }
 
@@ -31,13 +33,9 @@ public abstract class SpawnZone : PersistableObject
         Transform t = shape.transform;
         t.localPosition = SpawnPoint;
         t.localRotation = Random.rotation;
-        t.localScale = Vector3.one * Random.Range(0.1f, 1f);
-        shape.SetColor(Random.ColorHSV(
-            hueMin: 0, hueMax: 1
-            , saturationMin: 0.5f, saturationMax: 1
-            , valueMin: 0.25f, valueMax: 1
-            , alphaMin: 1, alphaMax: 1));
-        shape.AngularVelocity = Random.onUnitSphere * Random.Range(0, 90f);
+        t.localScale = Vector3.one * spawnConfig.scale.RandomValueInRange;
+        shape.SetColor(spawnConfig.color.RandomInRange);
+        shape.AngularVelocity = Random.onUnitSphere * spawnConfig.angularSpeed.RandomValueInRange;
         Vector3 direction;
         switch (spawnConfig.spawnMovementDirection)
         {
@@ -57,6 +55,7 @@ public abstract class SpawnZone : PersistableObject
                 direction = Vector3.zero;
                 break;
         }
+
         shape.Velocity = direction * spawnConfig.spawnSpeed.RandomValueInRange;
     }
 }
