@@ -150,6 +150,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baf3bbc5d24ebee488ecd6a2993c4e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    spawnMovementDirection: 0
+    spawnSpeed:
+      min: 0
+      max: 0
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 0
 --- !u!4 &197993457
 Transform:
@@ -265,6 +286,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baf3bbc5d24ebee488ecd6a2993c4e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    spawnMovementDirection: 0
+    spawnSpeed:
+      min: 0
+      max: 0
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 0
 --- !u!4 &328094297
 Transform:
@@ -310,6 +352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff74a141cf70bd747a1e4b016a6b0c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawanZone: {fileID: 0}
   persistableObjects:
   - {fileID: 687227934}
   - {fileID: 197993456}
@@ -360,6 +403,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27109877d4da7eb49bc48c2d2a8d1f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    spawnMovementDirection: 0
+    spawnSpeed:
+      min: 0
+      max: 1
+    angularSpeed:
+      min: 0
+      max: 1
+    scale:
+      min: 0
+      max: 1
+    color:
+      hue:
+        min: 0
+        max: 1
+      saturation:
+        min: 0
+        max: 1
+      value:
+        min: 0
+        max: 1
+  overrideConfig: 0
   sequential: 1
   spawnZones:
   - {fileID: 197993456}
@@ -414,6 +479,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e8519a3009f3149b2aa847ed778ca7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    spawnMovementDirection: 0
+    spawnSpeed:
+      min: 0
+      max: 0
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 0
 --- !u!4 &1021002008
 Transform:
@@ -459,6 +545,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e8519a3009f3149b2aa847ed778ca7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnConfig:
+    spawnMovementDirection: 0
+    spawnSpeed:
+      min: 0
+      max: 0
+    angularSpeed:
+      min: 0
+      max: 0
+    scale:
+      min: 0
+      max: 0
+    color:
+      hue:
+        min: 0
+        max: 0
+      saturation:
+        min: 0
+        max: 0
+      value:
+        min: 0
+        max: 0
   surfaceOnly: 0
 --- !u!4 &1273672324
 Transform:
