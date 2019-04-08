@@ -171,6 +171,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 0
+    uniformColor: 0
   surfaceOnly: 0
 --- !u!4 &197993457
 Transform:
@@ -307,6 +308,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 0
+    uniformColor: 0
   surfaceOnly: 0
 --- !u!4 &328094297
 Transform:
@@ -352,7 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff74a141cf70bd747a1e4b016a6b0c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawanZone: {fileID: 0}
+  spawanZone: {fileID: 687227934}
   persistableObjects:
   - {fileID: 687227934}
   - {fileID: 197993456}
@@ -424,6 +426,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 1
+    uniformColor: 0
   overrideConfig: 0
   sequential: 1
   spawnZones:
@@ -500,6 +503,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 0
+    uniformColor: 0
   surfaceOnly: 0
 --- !u!4 &1021002008
 Transform:
@@ -566,6 +570,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 0
+    uniformColor: 0
   surfaceOnly: 0
 --- !u!4 &1273672324
 Transform:

@@ -23,7 +23,7 @@ public class Game : PersistableObject
     }
 
     #region version
-    public const int nowSaveVersion = 7;
+    public const int nowSaveVersion = version_8;
     public const int version_1 = 1; //版本1储存的是shape的shapeId
     public const int version_2 = 2; //版本2储存的是shape的materialId
     public const int version_3 = 3; //版本3储存的是shape的颜色
@@ -31,6 +31,7 @@ public class Game : PersistableObject
     public const int version_5 = 5; //版本5储存的是生成的随机数种子
     public const int version_6 = 6; //版本6储存的是生成毁灭的速度和进度
     public const int version_7 = 7; //版本7储存的是物体的旋转速度和运动速度
+    public const int version_8 = 8; //版本8储存的是全部Shape颜色
     #endregion
 
     [SerializeField] private ShapeFactory shapeFactory;

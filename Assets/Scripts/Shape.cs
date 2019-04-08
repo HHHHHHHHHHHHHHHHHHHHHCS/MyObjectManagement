@@ -5,10 +5,11 @@ using UnityEngine;
 public class Shape : PersistableObject
 {
     private static readonly int colorPropertyId = Shader.PropertyToID("_Color");
-    private static  MaterialPropertyBlock shaderPropertyBlock;
+    private static  MaterialPropertyBlock sharedPropertyBlock;
 
+    [SerializeField]
+    private MeshRenderer[] meshRenderers;
 
-    private MeshRenderer meshRenderer;
     private int shapeId = int.MinValue;
 
     public int MaterialId { get; private set; }
@@ -16,7 +17,7 @@ public class Shape : PersistableObject
     public Vector3 Velocity { get; set; }
 
 
-    private Color color;
+    private Color[] colors;
 
     public int ShapeId
     {
@@ -34,9 +35,14 @@ public class Shape : PersistableObject
         }
     }
 
+    public int ColorCount
+    {
+        get { return colors.Length; }
+    }
+
     private void Awake()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
+        colors = new Color[meshRenderers.Length];
     }
 
     public void GameUpdate()
@@ -47,25 +53,47 @@ public class Shape : PersistableObject
 
     public void SetMaterial(Material material, int materialId)
     {
-        meshRenderer.material = material;
+        foreach (var mr in meshRenderers)
+        {
+            mr.material = material;
+        }
         MaterialId = materialId;
     }
 
-    public void SetColor(Color col)
+    public void SetColor(Color color)
     {
-        color = col;
-        if (shaderPropertyBlock == null)
+        if (sharedPropertyBlock == null)
         {
-            shaderPropertyBlock = new MaterialPropertyBlock();
+            sharedPropertyBlock = new MaterialPropertyBlock();
         }
-        shaderPropertyBlock.SetColor(colorPropertyId, color);
-        meshRenderer.SetPropertyBlock(shaderPropertyBlock);
+
+        sharedPropertyBlock.SetColor(colorPropertyId, color);
+        for (int i = 0; i < meshRenderers.Length; i++)
+        {
+            colors[i] = color;
+            meshRenderers[i].SetPropertyBlock(sharedPropertyBlock);
+        }
+    }
+
+    public void SetColor(int index, Color color)
+    {
+        if (sharedPropertyBlock == null)
+        {
+            sharedPropertyBlock = new MaterialPropertyBlock();
+        }
+
+        sharedPropertyBlock.SetColor(colorPropertyId, color);
+        colors[index] = color;
+        meshRenderers[index].SetPropertyBlock(sharedPropertyBlock);
     }
 
     public override void Save(GameDataWriter writer)
     {
         base.Save(writer);
-        writer.Write(color);
+        foreach (var color in colors)
+        {
+            writer.Write(color);
+        }
         writer.Write(AngularVelocity);
         writer.Write(Velocity);
     }
@@ -73,7 +101,17 @@ public class Shape : PersistableObject
     public override void Load(GameDataReader reader)
     {
         base.Load(reader);
-        SetColor(reader.Version >= Game.version_3 ? reader.ReadColor() : Color.white);
+        if (reader.Version >= Game.version_8)
+        {
+            for (int i = 0; i < colors.Length; i++)
+            {
+                SetColor(i, reader.ReadColor());
+            }
+        }
+        else
+        {
+            SetColor(reader.Version >= Game.version_3 ? reader.ReadColor() : Color.white);
+        }
         AngularVelocity = reader.Version >= Game.version_7 ? reader.ReadVector3() : Vector3.zero;
         Velocity = reader.Version >= 4 ? reader.ReadVector3() : Vector3.zero;
     }

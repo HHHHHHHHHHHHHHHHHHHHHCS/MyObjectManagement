@@ -1381,7 +1381,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shapeFactory: {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
   storage: {fileID: 1072439998}
-  levelCount: 2
+  reSeedOnLoad: 0
   createKey: 99
   destoryKey: 120
   newGameKey: 110
