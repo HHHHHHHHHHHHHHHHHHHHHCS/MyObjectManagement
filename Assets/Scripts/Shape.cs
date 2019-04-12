@@ -87,6 +87,32 @@ public class Shape : PersistableObject
         meshRenderers[index].SetPropertyBlock(sharedPropertyBlock);
     }
 
+    private void LoadColors(GameDataReader reader)
+    {
+        int count = reader.ReadInt();
+        int min = Mathf.Min(count, colors.Length);;
+        int i = 0;
+        for (; i < min; i++)
+        {
+            SetColor(i,reader.ReadColor());
+        }
+
+        if (count > min)
+        {
+            for (; i<count; i++)
+            {
+                reader.ReadColor();
+            }
+        }
+        else if (count < min)
+        {
+            for (; i < min; i++)
+            {
+                SetColor(i, Color.white);
+            }
+        }
+    }
+
     public override void Save(GameDataWriter writer)
     {
         base.Save(writer);
@@ -103,10 +129,7 @@ public class Shape : PersistableObject
         base.Load(reader);
         if (reader.Version >= Game.version_8)
         {
-            for (int i = 0; i < colors.Length; i++)
-            {
-                SetColor(i, reader.ReadColor());
-            }
+            LoadColors(reader);
         }
         else
         {
