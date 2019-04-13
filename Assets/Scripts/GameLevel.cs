@@ -7,7 +7,7 @@ public class GameLevel : PersistableObject
     public static GameLevel Current { get; private set; }
 
     [SerializeField]
-    private SpawnZone spawanZone;
+    private SpawnZone spawnZone;
 
     [SerializeField]
     private PersistableObject[] persistableObjects;
@@ -15,9 +15,9 @@ public class GameLevel : PersistableObject
 
     private void Start()
     {
-        if (spawanZone == null)
+        if (spawnZone == null)
         {
-            spawanZone = GameObject.Find("SpawnZone").GetComponent<SpawnZone>();
+            spawnZone = GameObject.Find("SpawnZone")?.GetComponent<SpawnZone>();
         }
     }
 
@@ -30,9 +30,9 @@ public class GameLevel : PersistableObject
         }
     }
 
-    public void ConfigureSpawn(Shape shape)
+    public Shape SpawnShape()
     {
-        spawanZone.ConfigureSpawn(shape);
+        return spawnZone.SpawnShape();
     }
 
     public override void Save(GameDataWriter writer)

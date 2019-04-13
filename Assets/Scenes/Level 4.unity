@@ -168,6 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
+    - {fileID: 11400000, guid: c8f843681c979a24ea05a0b5308d94f5, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -188,6 +191,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 1
+    uniformColor: 0
   overrideConfig: 0
   sequential: 1
   spawnZones:
@@ -238,6 +242,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -246,8 +252,8 @@ MonoBehaviour:
       min: 0
       max: 0
     scale:
-      min: 0
-      max: 0
+      min: 1
+      max: 1
     color:
       hue:
         min: 0
@@ -258,6 +264,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 0
+    uniformColor: 0
   surfaceOnly: 0
 --- !u!1 &292682217
 GameObject:
@@ -359,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff74a141cf70bd747a1e4b016a6b0c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawanZone: {fileID: 89742371}
+  spawnZone: {fileID: 89742371}
   persistableObjects:
   - {fileID: 687227934}
   - {fileID: 1568878462}
@@ -471,6 +478,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: c8f843681c979a24ea05a0b5308d94f5, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -479,8 +488,8 @@ MonoBehaviour:
       min: 0
       max: 0
     scale:
-      min: 0
-      max: 0
+      min: 1
+      max: 1
     color:
       hue:
         min: 0
@@ -491,6 +500,7 @@ MonoBehaviour:
       value:
         min: 0
         max: 0
+    uniformColor: 0
   surfaceOnly: 0
 --- !u!1 &1568878460
 GameObject:

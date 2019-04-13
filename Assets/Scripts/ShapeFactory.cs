@@ -14,6 +14,26 @@ public class ShapeFactory : ScriptableObject
 
     private Scene poolScene;
 
+    [System.NonSerialized]
+    private int factoryId = int.MinValue;
+
+    public int FactoryId
+    {
+        get { return factoryId; }
+        set
+        {
+            if (factoryId == int.MinValue && value != int.MinValue)
+            {
+                factoryId = value;
+            }
+            else
+            {
+                Debug.Log("Not allowed to change factoryId.");
+            }
+        }
+    }
+
+
     public Shape Get(int shapeId = 0, int materialId = 0)
     {
         Shape instance = null;
@@ -37,6 +57,7 @@ public class ShapeFactory : ScriptableObject
         if(instance == null)
         {
             instance = Instantiate(prefabs[shapeId]);
+            instance.OriginFactory = this;
             instance.ShapeId = shapeId;
         }
 
@@ -51,6 +72,12 @@ public class ShapeFactory : ScriptableObject
 
     public void Reclaim(Shape shape)
     {
+        if (shape.OriginFactory != this)
+        {
+            Debug.LogError("Tried to reclaim shape with wrong factory");
+            return;
+        }
+
         if (recycle)
         {
             if (pools == null)

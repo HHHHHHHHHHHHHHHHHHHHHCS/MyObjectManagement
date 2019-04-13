@@ -151,6 +151,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -288,6 +290,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -354,7 +358,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff74a141cf70bd747a1e4b016a6b0c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawanZone: {fileID: 687227934}
+  spawnZone: {fileID: 0}
   persistableObjects:
   - {fileID: 687227934}
   - {fileID: 197993456}
@@ -406,6 +410,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
+    - {fileID: 11400000, guid: c8f843681c979a24ea05a0b5308d94f5, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -483,6 +490,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: c8f843681c979a24ea05a0b5308d94f5, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -550,6 +559,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: c8f843681c979a24ea05a0b5308d94f5, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0

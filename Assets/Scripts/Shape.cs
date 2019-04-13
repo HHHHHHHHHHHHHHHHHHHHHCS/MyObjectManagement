@@ -18,6 +18,23 @@ public class Shape : PersistableObject
 
 
     private Color[] colors;
+    private ShapeFactory originFactory;
+
+    public ShapeFactory OriginFactory
+    {
+        get { return originFactory; }
+        set
+        {
+            if (originFactory == null)
+            {
+                originFactory = value;
+            }
+            else
+            {
+                Debug.LogError("Not allowed to change origin factory.");
+            }
+        }
+    }
 
     public int ShapeId
     {
@@ -111,6 +128,11 @@ public class Shape : PersistableObject
                 SetColor(i, Color.white);
             }
         }
+    }
+
+    public void Recycle()
+    {
+        OriginFactory.Reclaim(this);
     }
 
     public override void Save(GameDataWriter writer)

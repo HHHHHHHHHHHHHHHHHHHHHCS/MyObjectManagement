@@ -23,7 +23,7 @@ public class Game : PersistableObject
     }
 
     #region version
-    public const int nowSaveVersion = version_8;
+    public const int nowSaveVersion = version_9;
     public const int version_1 = 1; //版本1储存的是shape的shapeId
     public const int version_2 = 2; //版本2储存的是shape的materialId
     public const int version_3 = 3; //版本3储存的是shape的颜色
@@ -32,9 +32,10 @@ public class Game : PersistableObject
     public const int version_6 = 6; //版本6储存的是生成毁灭的速度和进度
     public const int version_7 = 7; //版本7储存的是物体的旋转速度和运动速度
     public const int version_8 = 8; //版本8储存的是全部Shape颜色
+    public const int version_9 = 9; //版本9储存的是ShapeFactoryID
     #endregion
 
-    [SerializeField] private ShapeFactory shapeFactory;
+    [SerializeField] private ShapeFactory[] shapeFactories;
     public PersistenStorage storage;
     [SerializeField] private bool reSeedOnLoad;
 
@@ -57,10 +58,20 @@ public class Game : PersistableObject
 
     private Random.State mainRandomState;
 
-    private void Awake()
-    {
-    }
+    //private void Awake()
+    //{
+    //}
 
+    private void OnEnable()
+    {
+        if (shapeFactories[0].FactoryId != 0)
+        {
+            for (int i = 0; i < shapeFactories.Length; i++)
+            {
+                shapeFactories[i].FactoryId = i;
+            }
+        }
+    }
 
     /// <summary>
     /// 为什么用start,因为Awake的时候一些东西还没有准备就绪
@@ -164,9 +175,9 @@ public class Game : PersistableObject
 
     private void CreateShape()
     {
-        Shape instance = shapeFactory.GetRandom();
-        GameLevel.Current.ConfigureSpawn(instance);
-        shapes.Add(instance);
+        //Shape instance = shapeFactory.GetRandom();
+        //GameLevel.Current.ConfigureSpawn(instance);
+        shapes.Add(GameLevel.Current.SpawnShape());
     }
 
     private void DestroyShape()
@@ -174,7 +185,8 @@ public class Game : PersistableObject
         if (shapes.Count > 0)
         {
             int index = Random.Range(0, shapes.Count);
-            shapeFactory.Reclaim(shapes[index]);
+            //shapeFactory.Reclaim(shapes[index]);
+            shapes[index].Recycle();
             int lastIndex = shapes.Count - 1;
             shapes[index] = shapes[lastIndex];
             shapes.RemoveAt(lastIndex);
@@ -196,7 +208,8 @@ public class Game : PersistableObject
 
         foreach (var obj in shapes)
         {
-            shapeFactory.Reclaim(obj);
+            //shapeFactory.Reclaim(obj);
+            obj.Recycle();
         }
 
         shapes.Clear();
@@ -215,6 +228,7 @@ public class Game : PersistableObject
         GameLevel.Current.Save(writer);
         foreach (var item in shapes)
         {
+            writer.Write(item.OriginFactory.FactoryId);
             writer.Write(item.ShapeId);
             writer.Write(item.MaterialId);
             item.Save(writer);
@@ -270,9 +284,10 @@ public class Game : PersistableObject
 
         for (int i = 0; i < count; i++)
         {
+            int factoryId = version >= version_9 ? reader.ReadInt() : 0;
             int shapedId = version >= version_1 ? reader.ReadInt() : 0;
             int materialId = version >= version_2 ? reader.ReadInt() : 0;
-            Shape instance = shapeFactory.Get(shapedId, materialId);
+            Shape instance = shapeFactories[factoryId].Get(shapedId, materialId);
             instance.Load(reader);
             shapes.Add(instance);
         }

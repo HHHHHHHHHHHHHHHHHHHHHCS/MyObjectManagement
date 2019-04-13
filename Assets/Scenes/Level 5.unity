@@ -222,6 +222,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnConfig:
+    factories:
+    - {fileID: 11400000, guid: 659d5a8b40d2bfb4785a2370bc33ae15, type: 2}
     spawnMovementDirection: 0
     spawnSpeed:
       min: 0
@@ -288,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff74a141cf70bd747a1e4b016a6b0c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawanZone: {fileID: 296847707}
+  spawnZone: {fileID: 0}
   persistableObjects:
   - {fileID: 296847707}
 --- !u!4 &508398862

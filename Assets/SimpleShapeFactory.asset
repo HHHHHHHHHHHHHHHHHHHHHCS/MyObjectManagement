@@ -11,15 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: 60894a6fa46cf6c458f110fec604996c, type: 3}
-  m_Name: ShapeFactory
+  m_Name: SimpleShapeFactory
   m_EditorClassIdentifier: 
   prefabs:
   - {fileID: 4286828992239964854, guid: ace2b30c94e3dd4449619094f1859362, type: 3}
   - {fileID: 8156746545938110428, guid: a70abb88b055a0d4d8142e9cf6c06a74, type: 3}
   - {fileID: 874548652292473212, guid: 290be9516900bda4498c45773729ab7a, type: 3}
-  - {fileID: 8786325166394749334, guid: aca5731cdd88b5d4eb93c3fb5a66aa6f, type: 3}
-  - {fileID: 8956976369214477005, guid: 86a7428fe49125d48bc1790dc8988378, type: 3}
-  - {fileID: 6238191517056251782, guid: 1f408d5b450fa964c881cd8ccc47c483, type: 3}
   materials:
   - {fileID: 2100000, guid: c117ddc8dc95f424d8ddf955ae960b38, type: 2}
   - {fileID: 2100000, guid: ff877f1cafc466f4788e75e9576bf3bf, type: 2}
