@@ -20,6 +20,7 @@ public abstract class SpawnZone : PersistableObject
         public ShapeFactory[] factories;
         public SpawnMovementDirection spawnMovementDirection;
         public FloatRange spawnSpeed;
+        public FloatRange speed;
         public FloatRange angularSpeed;
         public FloatRange scale;
         public ColorRangeHSV color;
@@ -50,28 +51,41 @@ public abstract class SpawnZone : PersistableObject
                 shape.SetColor(i,spawnConfig.color.RandomInRange);
             }
         }
-        shape.AngularVelocity = Random.onUnitSphere * spawnConfig.angularSpeed.RandomValueInRange;
-        Vector3 direction;
-        switch (spawnConfig.spawnMovementDirection)
+
+        float angularSpeed = spawnConfig.angularSpeed.RandomValueInRange;
+        if (angularSpeed != 0f)
         {
-            case SpawnConfiguration.SpawnMovementDirection.Forward:
-                direction = transform.forward;
-                break;
-            case SpawnConfiguration.SpawnMovementDirection.Upward:
-                direction = transform.up;
-                break;
-            case SpawnConfiguration.SpawnMovementDirection.Outward:
-                direction = (t.position - transform.position).normalized;
-                break;
-            case SpawnConfiguration.SpawnMovementDirection.Random:
-                direction = Random.onUnitSphere;
-                break;
-            default:
-                direction = Vector3.zero;
-                break;
+            var rotation = shape.AddBehavior<RotationShapeBehavior>();
+            rotation.AngularVelocity = Random.onUnitSphere * angularSpeed;
         }
 
-        shape.Velocity = direction * spawnConfig.spawnSpeed.RandomValueInRange;
+        float speed = spawnConfig.speed.RandomValueInRange;
+        if (speed != 0)
+        {
+            Vector3 direction;
+            switch (spawnConfig.spawnMovementDirection)
+            {
+                case SpawnConfiguration.SpawnMovementDirection.Forward:
+                    direction = transform.forward;
+                    break;
+                case SpawnConfiguration.SpawnMovementDirection.Upward:
+                    direction = transform.up;
+                    break;
+                case SpawnConfiguration.SpawnMovementDirection.Outward:
+                    direction = (t.position - transform.position).normalized;
+                    break;
+                case SpawnConfiguration.SpawnMovementDirection.Random:
+                    direction = Random.onUnitSphere;
+                    break;
+                default:
+                    direction = Vector3.zero;
+                    break;
+            }
+
+            var movement = shape.AddBehavior<MovementShapeBehavior>();
+            movement.Velocity = direction * speed;
+        }
+ 
         return shape;
     }
 }
