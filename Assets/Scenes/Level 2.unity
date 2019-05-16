@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -161,6 +161,24 @@ Light:
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_Flare: {fileID: 0}
@@ -168,12 +186,15 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &292682219
@@ -216,7 +237,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 508398860}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: ff74a141cf70bd747a1e4b016a6b0c64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -263,7 +283,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 687227933}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_GeneratorAsset: {fileID: 0}
   m_Script: {fileID: 11500000, guid: baf3bbc5d24ebee488ecd6a2993c4e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -276,6 +295,9 @@ MonoBehaviour:
     spawnSpeed:
       min: 0
       max: 1
+    speed:
+      min: 0
+      max: 0
     angularSpeed:
       min: 0
       max: 1
@@ -293,6 +315,13 @@ MonoBehaviour:
         min: 0
         max: 1
     uniformColor: 0
+    oscillationDirection: 2
+    oscillationAmplitude:
+      min: 0
+      max: 1
+    oscillationFrequency:
+      min: 0
+      max: 1
   surfaceOnly: 0
 --- !u!4 &687227935
 Transform:

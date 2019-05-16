@@ -53,10 +53,9 @@ public class Shape : PersistableObject
         }
     }
 
-    public int ColorCount
-    {
-        get { return colors.Length; }
-    }
+    public int ColorCount => colors.Length;
+
+    public float Age { get; private set; }
 
     private void Awake()
     {
@@ -65,6 +64,7 @@ public class Shape : PersistableObject
 
     public void GameUpdate()
     {
+        Age += Time.deltaTime;
         foreach (var item in behaviorList)
         {
             item.GameUpdate(this);
@@ -137,9 +137,10 @@ public class Shape : PersistableObject
 
     public void Recycle()
     {
+        Age = 0f;
         foreach (var item in behaviorList)
         {
-            Destroy(item);
+            item.Recycle();
         }
 
         behaviorList.Clear();
@@ -154,6 +155,7 @@ public class Shape : PersistableObject
             writer.Write(color);
         }
 
+        writer.Write(Age);
         writer.Write(behaviorList.Count);
 
         foreach (var item in behaviorList)
@@ -179,10 +181,13 @@ public class Shape : PersistableObject
         //Velocity = reader.Version >= 7 ? reader.ReadVector3() : Vector3.zero;
         if (reader.Version >= Game.version_10)
         {
+            Age = reader.ReadFloat();
             int behaviorCount = reader.ReadInt();
             for (int i = 0; i < behaviorCount; i++)
             {
-                AddBehavior((ShapeBehavior.ShapeBehaviorType) reader.ReadInt()).Load(reader);
+                ShapeBehavior behavior = ((ShapeBehaviorType) reader.ReadInt()).GetInstance();
+                behaviorList.Add(behavior);
+                behavior.Load(reader);
             }
         }
         else if (reader.Version >= Game.version_7)
@@ -197,24 +202,10 @@ public class Shape : PersistableObject
         behaviorList.Add(behavior);
     }
 
-    public T AddBehavior<T>() where T : ShapeBehavior
+    public T AddBehavior<T>() where T : ShapeBehavior, new()
     {
-        T behavior = gameObject.AddComponent<T>();
+        T behavior = ShapeBehaviorPool<T>.Get();
         behaviorList.Add(behavior);
         return behavior;
-    }
-
-    private ShapeBehavior AddBehavior(ShapeBehavior.ShapeBehaviorType type)
-    {
-        switch (type)
-        {
-            case ShapeBehavior.ShapeBehaviorType.Movement:
-                return AddBehavior<MovementShapeBehavior>();
-            case ShapeBehavior.ShapeBehaviorType.Rotation:
-                return AddBehavior<RotationShapeBehavior>();
-        }
-
-        Debug.LogError("Forgot to support" + type);
-        return null;
     }
 }
