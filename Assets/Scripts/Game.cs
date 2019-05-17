@@ -178,7 +178,7 @@ public class Game : PersistableObject
     {
         //Shape instance = shapeFactory.GetRandom();
         //GameLevel.Current.ConfigureSpawn(instance);
-        shapes.Add(GameLevel.Current.SpawnShape());
+        GameLevel.Current.SpawnShape();
     }
 
     private void DestroyShape()
@@ -216,6 +216,10 @@ public class Game : PersistableObject
         shapes.Clear();
     }
 
+    public void AddShape(Shape shape)
+    {
+        shapes.Add(shape);
+    }
 
     public override void Save(GameDataWriter writer)
     {
@@ -290,7 +294,6 @@ public class Game : PersistableObject
             int materialId = version >= version_2 ? reader.ReadInt() : 0;
             Shape instance = shapeFactories[factoryId].Get(shapedId, materialId);
             instance.Load(reader);
-            shapes.Add(instance);
         }
     }
 
