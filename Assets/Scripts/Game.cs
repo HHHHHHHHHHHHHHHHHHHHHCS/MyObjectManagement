@@ -41,7 +41,7 @@ public class Game : PersistableObject
     [SerializeField] private bool reSeedOnLoad;
 
     public KeyCode createKey = KeyCode.C;
-    public KeyCode destoryKey = KeyCode.X;
+    public KeyCode destoryKey = KeyCode.D;
     public KeyCode newGameKey = KeyCode.N;
     public KeyCode saveKey = KeyCode.S;
     public KeyCode loadKey = KeyCode.L;

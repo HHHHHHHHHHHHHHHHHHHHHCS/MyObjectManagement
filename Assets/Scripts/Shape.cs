@@ -3,8 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct ShapeInstance
+{
+    public Shape Shape { get; private set; }
+    private int instanceId;
+
+    public bool IsValid => Shape && instanceId == Shape.InstanceId;
+
+    public ShapeInstance(Shape shape)
+    {
+        Shape = shape;
+        instanceId = shape.InstanceId;
+    }
+
+    public static implicit operator ShapeInstance(Shape shape)
+    {
+        return new ShapeInstance(shape);
+    }
+
+}
+
 public class Shape : PersistableObject
 {
+
     private static readonly int colorPropertyId = Shader.PropertyToID("_Color");
     private static MaterialPropertyBlock sharedPropertyBlock;
 
@@ -55,6 +77,7 @@ public class Shape : PersistableObject
 
     public int ColorCount => colors.Length;
 
+    public  int InstanceId { get; private set; }
     public float Age { get; private set; }
 
     private void Awake()
@@ -65,10 +88,15 @@ public class Shape : PersistableObject
     public void GameUpdate()
     {
         Age += Time.deltaTime;
-        foreach (var item in behaviorList)
+        for (int i = behaviorList.Count - 1; i >= 0; i--)
         {
-            item.GameUpdate(this);
+            if (!behaviorList[i].GameUpdate(this))
+            {
+                behaviorList[i].Recycle();
+                behaviorList.RemoveAt(i);
+            }
         }
+
     }
 
     public void SetMaterial(Material material, int materialId)
@@ -138,6 +166,7 @@ public class Shape : PersistableObject
     public void Recycle()
     {
         Age = 0f;
+        InstanceId += 1;
         foreach (var item in behaviorList)
         {
             item.Recycle();

@@ -1368,7 +1368,7 @@ MonoBehaviour:
   storage: {fileID: 1072439998}
   reSeedOnLoad: 0
   createKey: 99
-  destoryKey: 120
+  destoryKey: 100
   newGameKey: 110
   saveKey: 115
   loadKey: 108
