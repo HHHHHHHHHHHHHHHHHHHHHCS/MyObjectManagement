@@ -29,6 +29,13 @@ public abstract class SpawnZone : PersistableObject
             public FloatRange orbitFrequency;
         }
 
+        [System.Serializable]
+        public struct LifecycleConfiguration
+        {
+            [FloatRangeSlider(0f,2f)]
+            public FloatRange growingDuration;
+        }
+
         public ShapeFactory[] factories;
 
         public SpawnMovementDirection spawnMovementDirection;
@@ -46,6 +53,9 @@ public abstract class SpawnZone : PersistableObject
         public FloatRange oscillationFrequency;
 
         public SatelliteConfiguration satellite;
+
+        public LifecycleConfiguration lifecycle;
+
     }
 
     [SerializeField] private SpawnConfiguration spawnConfig;
@@ -79,12 +89,16 @@ public abstract class SpawnZone : PersistableObject
         }
 
 
+        float growingDuration = spawnConfig.lifecycle.growingDuration.RandomValueInRange;
+
         SetupOscillation(shape);
         int satelliteCount = spawnConfig.satellite.amount.RandomValueInRange;
         for (int i = 0; i < satelliteCount; i++)
         {
-            CreateSatelliteFor(shape);
+            CreateSatelliteFor(shape,growingDuration);
         }
+
+        SetupLifecycle(shape,growingDuration);
     }
 
     private void SetupColor(Shape shape)
@@ -135,7 +149,7 @@ public abstract class SpawnZone : PersistableObject
     }
 
 
-    private void CreateSatelliteFor(Shape focalShape)
+    private void CreateSatelliteFor(Shape focalShape,float growingDuration)
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
@@ -147,5 +161,14 @@ public abstract class SpawnZone : PersistableObject
         shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape,focalShape
             ,spawnConfig.satellite.orbitRadius.RandomValueInRange
             ,spawnConfig.satellite.orbitFrequency.RandomValueInRange);
+        SetupLifecycle(shape,growingDuration);
+    }
+
+    private void SetupLifecycle(Shape shape, float growingDuration)
+    {
+        if (growingDuration > 0f)
+        {
+            shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape,growingDuration);
+        }
     }
 }
