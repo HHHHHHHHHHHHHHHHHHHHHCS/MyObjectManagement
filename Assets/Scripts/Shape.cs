@@ -7,14 +7,37 @@ using UnityEngine;
 public struct ShapeInstance
 {
     public Shape Shape { get; private set; }
-    private int instanceId;
+    private int instanceIdOrSaveIndex;
 
-    public bool IsValid => Shape && instanceId == Shape.InstanceId;
+    public bool IsValid => Shape && instanceIdOrSaveIndex == Shape.InstanceId;
 
     public ShapeInstance(Shape shape)
     {
         Shape = shape;
-        instanceId = shape.InstanceId;
+        instanceIdOrSaveIndex = shape.InstanceId;
+    }
+
+    /// <summary>
+    /// 延迟加载用,Resolve 用于完成真正的实例化
+    /// </summary>
+    /// <param name="saveIndex"></param>
+    public ShapeInstance(int saveIndex)
+    {
+        Shape = null;
+        instanceIdOrSaveIndex = saveIndex;
+    }
+
+    /// <summary>
+    /// 这个处理是因为有时候物体还没有加载完成就要进入卫星状态
+    /// 所以添加这个方法,用于延迟加载
+    /// </summary>
+    public void Resolve()
+    {
+        if (instanceIdOrSaveIndex >= 0)
+        {
+            Shape = Game.Instance.GetShape(instanceIdOrSaveIndex);
+            instanceIdOrSaveIndex = Shape.InstanceId;
+        }
     }
 
     public static implicit operator ShapeInstance(Shape shape)
@@ -22,11 +45,11 @@ public struct ShapeInstance
         return new ShapeInstance(shape);
     }
 
+
 }
 
 public class Shape : PersistableObject
 {
-
     private static readonly int colorPropertyId = Shader.PropertyToID("_Color");
     private static MaterialPropertyBlock sharedPropertyBlock;
 
@@ -77,8 +100,9 @@ public class Shape : PersistableObject
 
     public int ColorCount => colors.Length;
 
-    public  int InstanceId { get; private set; }
+    public int InstanceId { get; private set; }
     public float Age { get; private set; }
+    public int SaveIndex { get; set; }
 
     private void Awake()
     {
@@ -96,7 +120,6 @@ public class Shape : PersistableObject
                 behaviorList.RemoveAt(i);
             }
         }
-
     }
 
     public void SetMaterial(Material material, int materialId)
@@ -236,5 +259,13 @@ public class Shape : PersistableObject
         T behavior = ShapeBehaviorPool<T>.Get();
         behaviorList.Add(behavior);
         return behavior;
+    }
+
+    public void ResolveShapeInstance()
+    {
+        foreach (var item in behaviorList)
+        {
+            item.ResolveShapeInstances();
+        }
     }
 }

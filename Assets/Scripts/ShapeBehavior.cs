@@ -32,4 +32,9 @@ public abstract class ShapeBehavior :
     public abstract void Load(GameDataReader reader);
 
     public abstract void Recycle();
+
+    public virtual void ResolveShapeInstances()
+    {
+
+    }
 }

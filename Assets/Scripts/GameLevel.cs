@@ -12,6 +12,9 @@ public class GameLevel : PersistableObject
     [SerializeField]
     private PersistableObject[] persistableObjects;
 
+    [field:SerializeField]
+    public int PopulationLimit { get; private set; } 
+
 
     private void Start()
     {

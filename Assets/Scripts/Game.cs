@@ -161,6 +161,15 @@ public class Game : PersistableObject
             destructionProgress -= 1;
             DestroyShape();
         }
+
+        int limit = GameLevel.Current.PopulationLimit;
+        if (limit > 0)
+        {
+            while (shapes.Count>limit)
+            {
+                DestroyShape();
+            }
+        }
     }
 
     public void ChangeCreationSpeed(float val)
@@ -189,6 +198,7 @@ public class Game : PersistableObject
             //shapeFactory.Reclaim(shapes[index]);
             shapes[index].Recycle();
             int lastIndex = shapes.Count - 1;
+            shapes[lastIndex].SaveIndex = index;
             shapes[index] = shapes[lastIndex];
             shapes.RemoveAt(lastIndex);
         }
@@ -218,7 +228,13 @@ public class Game : PersistableObject
 
     public void AddShape(Shape shape)
     {
+        shape.SaveIndex = shapes.Count;
         shapes.Add(shape);
+    }
+
+    public Shape GetShape(int index)
+    {
+        return shapes[index];
     }
 
     public override void Save(GameDataWriter writer)
@@ -294,6 +310,11 @@ public class Game : PersistableObject
             int materialId = version >= version_2 ? reader.ReadInt() : 0;
             Shape instance = shapeFactories[factoryId].Get(shapedId, materialId);
             instance.Load(reader);
+        }
+
+        foreach (var item in shapes)
+        {
+            item.ResolveShapeInstance();
         }
     }
 

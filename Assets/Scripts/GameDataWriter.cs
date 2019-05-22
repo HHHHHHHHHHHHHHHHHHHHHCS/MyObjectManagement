@@ -12,6 +12,11 @@ public class GameDataWriter
         writer = bw;
     }
 
+    public void Write(ShapeInstance value)
+    {
+        writer.Write(value.IsValid ? value.Shape.SaveIndex : -1);
+    }
+
     public void Write(float value)
     {
         writer.Write(value);
