@@ -339,7 +339,10 @@ MonoBehaviour:
     lifecycle:
       growingDuration:
         min: 0
-        max: 2
+        max: 0
+      dyingDuration:
+        min: 1
+        max: 1
   surfaceOnly: 0
 --- !u!4 &1058777475
 Transform:

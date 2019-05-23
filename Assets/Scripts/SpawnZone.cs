@@ -34,6 +34,24 @@ public abstract class SpawnZone : PersistableObject
         {
             [FloatRangeSlider(0f,2f)]
             public FloatRange growingDuration;
+
+            [FloatRangeSlider(0f,100f)]
+            public FloatRange adultDuration;
+
+            [FloatRangeSlider(0f, 2f)]
+            public FloatRange dyingDuration;
+
+            public Vector3 RandomDurations
+            {
+                get
+                {
+                    return new Vector3(
+                        growingDuration.RandomValueInRange,
+                        adultDuration.RandomValueInRange,
+                        dyingDuration.RandomValueInRange
+                    );
+                }
+            }
         }
 
         public ShapeFactory[] factories;
@@ -92,13 +110,15 @@ public abstract class SpawnZone : PersistableObject
         float growingDuration = spawnConfig.lifecycle.growingDuration.RandomValueInRange;
 
         SetupOscillation(shape);
+
+        Vector3 lifecycleDurations = spawnConfig.lifecycle.RandomDurations;
         int satelliteCount = spawnConfig.satellite.amount.RandomValueInRange;
         for (int i = 0; i < satelliteCount; i++)
         {
-            CreateSatelliteFor(shape,growingDuration);
+            CreateSatelliteFor(shape,lifecycleDurations);
         }
 
-        SetupLifecycle(shape,growingDuration);
+        SetupLifecycle(shape, lifecycleDurations);
     }
 
     private void SetupColor(Shape shape)
@@ -149,7 +169,7 @@ public abstract class SpawnZone : PersistableObject
     }
 
 
-    private void CreateSatelliteFor(Shape focalShape,float growingDuration)
+    private void CreateSatelliteFor(Shape focalShape,Vector3 lifecycleDurations)
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
@@ -161,14 +181,32 @@ public abstract class SpawnZone : PersistableObject
         shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape,focalShape
             ,spawnConfig.satellite.orbitRadius.RandomValueInRange
             ,spawnConfig.satellite.orbitFrequency.RandomValueInRange);
-        SetupLifecycle(shape,growingDuration);
+        SetupLifecycle(shape, lifecycleDurations);
     }
 
-    private void SetupLifecycle(Shape shape, float growingDuration)
+    private void SetupLifecycle(Shape shape, Vector3 durations)
     {
-        if (growingDuration > 0f)
+        if (durations.x > 0)
         {
-            shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape,growingDuration);
+            if (durations.y > 0f || durations.z > 0f)
+            {
+                shape.AddBehavior<LifecycleShapeBehavior>()
+                    .Initialize(shape,durations.x,durations.y,durations.z);
+            }
+            else
+            {
+                shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape, durations.x);
+
+            }
+        }
+        else if (durations.y > 0f)
+        {
+            shape.AddBehavior<LifecycleShapeBehavior>()
+                .Initialize(shape,durations.x,durations.y,durations.z);
+        }
+        else if (durations.z > 0f)
+        {
+            shape.AddBehavior<DyingShapeBehavior>().Initialize(shape, durations.y);
         }
     }
 }

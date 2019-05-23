@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -41,13 +42,14 @@ public class Game : PersistableObject
     [SerializeField] private bool reSeedOnLoad;
 
     public KeyCode createKey = KeyCode.C;
-    public KeyCode destoryKey = KeyCode.D;
+    public KeyCode destroyKey = KeyCode.D;
     public KeyCode newGameKey = KeyCode.N;
     public KeyCode saveKey = KeyCode.S;
     public KeyCode loadKey = KeyCode.L;
 
 
     private List<Shape> shapes;
+    private List<ShapeInstance> killList;
 
     private float creationSpeed;
     private float creationProgress;
@@ -58,6 +60,8 @@ public class Game : PersistableObject
     private int loadedLevelBuildIndex; //当前加载的场景的BuildIndex
 
     private Random.State mainRandomState;
+
+    private bool inGameUpdateLoop;
 
     //private void Awake()
     //{
@@ -80,6 +84,7 @@ public class Game : PersistableObject
     private void Start()
     {
         shapes = new List<Shape>();
+        killList=new List<ShapeInstance>();
 
         mainRandomState = Random.state;
 
@@ -109,7 +114,7 @@ public class Game : PersistableObject
         {
             CreateShape();
         }
-        else if (Input.GetKeyDown(destoryKey))
+        else if (Input.GetKeyDown(destroyKey))
         {
             DestroyShape();
         }
@@ -143,10 +148,13 @@ public class Game : PersistableObject
 
     private void FixedUpdate()
     {
+        inGameUpdateLoop = true;
         foreach (var item in shapes)
         {
             item.GameUpdate();
         }
+
+        inGameUpdateLoop = false;
 
         creationProgress += Time.deltaTime * creationSpeed;
         while (creationProgress >= 1)
@@ -169,6 +177,18 @@ public class Game : PersistableObject
             {
                 DestroyShape();
             }
+        }
+
+        if (killList.Count > 0)
+        {
+            foreach (var item in killList)
+            {
+                if (item.IsValid)
+                {
+                    KillImmediately(item.Shape);
+                }
+            }
+            killList.Clear();
         }
     }
 
@@ -194,6 +214,7 @@ public class Game : PersistableObject
     {
         if (shapes.Count > 0)
         {
+            /*
             int index = Random.Range(0, shapes.Count);
             //shapeFactory.Reclaim(shapes[index]);
             shapes[index].Recycle();
@@ -201,6 +222,9 @@ public class Game : PersistableObject
             shapes[lastIndex].SaveIndex = index;
             shapes[index] = shapes[lastIndex];
             shapes.RemoveAt(lastIndex);
+            */
+            Shape shape = shapes[Random.Range(0, shapes.Count)];
+            KillImmediately(shape);
         }
     }
 
@@ -330,5 +354,27 @@ public class Game : PersistableObject
         SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(levelBuildIndex));
         loadedLevelBuildIndex = levelBuildIndex;
         enabled = true;
+    }
+
+    public void Kill(Shape shape)
+    {
+        if (inGameUpdateLoop)
+        {
+            killList.Add(shape);
+        }
+        else
+        {
+            KillImmediately(shape);
+        }
+    }
+
+    private void KillImmediately(Shape shape)
+    {
+        int index = shape.SaveIndex;
+        shape.Recycle();
+        int lastIndex = shapes.Count - 1;
+        shapes[lastIndex].SaveIndex = index;
+        shapes[index] = shapes[lastIndex];
+        shapes.RemoveAt(lastIndex);
     }
 }
