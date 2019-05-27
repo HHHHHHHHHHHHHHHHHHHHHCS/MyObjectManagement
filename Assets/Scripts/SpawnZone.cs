@@ -22,24 +22,21 @@ public abstract class SpawnZone : PersistableObject
         {
             public IntRange amount;
 
-            [FloatRangeSlider(0.1f,1f)]
-            public FloatRange relativeScale;
+            [FloatRangeSlider(0.1f, 1f)] public FloatRange relativeScale;
 
             public FloatRange orbitRadius;
             public FloatRange orbitFrequency;
+            public bool uniformLifeCycles;
         }
 
         [System.Serializable]
         public struct LifecycleConfiguration
         {
-            [FloatRangeSlider(0f,2f)]
-            public FloatRange growingDuration;
+            [FloatRangeSlider(0f, 2f)] public FloatRange growingDuration;
 
-            [FloatRangeSlider(0f,100f)]
-            public FloatRange adultDuration;
+            [FloatRangeSlider(0f, 100f)] public FloatRange adultDuration;
 
-            [FloatRangeSlider(0f, 2f)]
-            public FloatRange dyingDuration;
+            [FloatRangeSlider(0f, 2f)] public FloatRange dyingDuration;
 
             public Vector3 RandomDurations
             {
@@ -73,7 +70,6 @@ public abstract class SpawnZone : PersistableObject
         public SatelliteConfiguration satellite;
 
         public LifecycleConfiguration lifecycle;
-
     }
 
     [SerializeField] private SpawnConfiguration spawnConfig;
@@ -115,7 +111,8 @@ public abstract class SpawnZone : PersistableObject
         int satelliteCount = spawnConfig.satellite.amount.RandomValueInRange;
         for (int i = 0; i < satelliteCount; i++)
         {
-            CreateSatelliteFor(shape,lifecycleDurations);
+            CreateSatelliteFor(shape,
+                spawnConfig.satellite.uniformLifeCycles ? lifecycleDurations : spawnConfig.lifecycle.RandomDurations);
         }
 
         SetupLifecycle(shape, lifecycleDurations);
@@ -169,18 +166,18 @@ public abstract class SpawnZone : PersistableObject
     }
 
 
-    private void CreateSatelliteFor(Shape focalShape,Vector3 lifecycleDurations)
+    private void CreateSatelliteFor(Shape focalShape, Vector3 lifecycleDurations)
     {
         int factoryIndex = Random.Range(0, spawnConfig.factories.Length);
         Shape shape = spawnConfig.factories[factoryIndex].GetRandom();
         Transform t = shape.transform;
         t.localRotation = Random.rotation;
-        t.localScale = focalShape.transform.localScale 
+        t.localScale = focalShape.transform.localScale
                        * spawnConfig.satellite.relativeScale.RandomValueInRange;
         SetupColor(shape);
-        shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape,focalShape
-            ,spawnConfig.satellite.orbitRadius.RandomValueInRange
-            ,spawnConfig.satellite.orbitFrequency.RandomValueInRange);
+        shape.AddBehavior<SatelliteShapeBehavior>().Initialize(shape, focalShape
+            , spawnConfig.satellite.orbitRadius.RandomValueInRange
+            , spawnConfig.satellite.orbitFrequency.RandomValueInRange);
         SetupLifecycle(shape, lifecycleDurations);
     }
 
@@ -191,18 +188,17 @@ public abstract class SpawnZone : PersistableObject
             if (durations.y > 0f || durations.z > 0f)
             {
                 shape.AddBehavior<LifecycleShapeBehavior>()
-                    .Initialize(shape,durations.x,durations.y,durations.z);
+                    .Initialize(shape, durations.x, durations.y, durations.z);
             }
             else
             {
                 shape.AddBehavior<GrowingShapeBehavior>().Initialize(shape, durations.x);
-
             }
         }
         else if (durations.y > 0f)
         {
             shape.AddBehavior<LifecycleShapeBehavior>()
-                .Initialize(shape,durations.x,durations.y,durations.z);
+                .Initialize(shape, durations.x, durations.y, durations.z);
         }
         else if (durations.z > 0f)
         {

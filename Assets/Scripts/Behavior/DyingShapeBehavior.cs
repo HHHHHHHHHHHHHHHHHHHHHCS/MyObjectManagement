@@ -22,13 +22,14 @@ public sealed class DyingShapeBehavior : ShapeBehavior
         float dyingDuration = shape.Age - dyingAge;
         if (dyingDuration < duration)
         {
-            float s = 1f - shape.Age / duration;
+            float s = 1f - dyingDuration / duration;
             s = (3f - 2f * s) * s * s;
             shape.transform.localScale = s * originalScale;
             return true;
         }
 
         shape.Die();
+        shape.MarkAsDying();
         return true;
     }
 

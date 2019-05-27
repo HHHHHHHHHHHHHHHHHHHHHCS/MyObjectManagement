@@ -100,6 +100,8 @@ public class Shape : PersistableObject
 
     public int ColorCount => colors.Length;
 
+    public bool IsMarkedAsDying => Game.Instance.IsMarkedAsDying(this);
+
     public int InstanceId { get; private set; }
     public float Age { get; private set; }
     public int SaveIndex { get; set; }
@@ -272,5 +274,11 @@ public class Shape : PersistableObject
     public void Die()
     {
         Game.Instance.Kill(this);
+    }
+
+
+    public void MarkAsDying()
+    {
+        Game.Instance.MarkAsDying(this);
     }
 }

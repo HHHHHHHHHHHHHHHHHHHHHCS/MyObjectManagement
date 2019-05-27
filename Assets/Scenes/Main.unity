@@ -1368,10 +1368,11 @@ MonoBehaviour:
   storage: {fileID: 1072439998}
   reSeedOnLoad: 0
   createKey: 99
-  destoryKey: 100
+  destroyKey: 100
   newGameKey: 110
   saveKey: 115
   loadKey: 108
+  destroyDuration: 1
 --- !u!1 &2014545696
 GameObject:
   m_ObjectHideFlags: 0
