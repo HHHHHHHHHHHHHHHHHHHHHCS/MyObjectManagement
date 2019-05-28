@@ -35,6 +35,7 @@ public class Game : PersistableObject
     public const int version_8 = 8; //版本8储存的是全部Shape颜色
     public const int version_9 = 9; //版本9储存的是ShapeFactoryID
     public const int version_10 = 10; //版本10储存的是ShapeBehavior行为
+    public const int version_11 = 11; //版本11储存的是SpawnZone的生产行为
 
     #endregion
 
@@ -68,6 +69,7 @@ public class Game : PersistableObject
     private bool inGameUpdateLoop;
 
     private int dyingShapeCount;
+
 
     //private void Awake()
     //{
