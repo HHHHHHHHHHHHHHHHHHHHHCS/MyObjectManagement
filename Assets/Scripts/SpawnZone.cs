@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public abstract class SpawnZone : PersistableObject
+public abstract class SpawnZone : GameLevelObject
 {
     [System.Serializable]
     public struct SpawnConfiguration
@@ -123,7 +123,7 @@ public abstract class SpawnZone : PersistableObject
         SetupLifecycle(shape, lifecycleDurations);
     }
 
-    private void FixedUpdate()
+    public override void GameUpdate()
     {
         spawnProgress += Time.deltaTime * spawnSpeed;
         while (spawnProgress >= 1f)
