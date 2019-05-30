@@ -242,8 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnZone: {fileID: 0}
-  persistableObjects:
-  - {fileID: 1058777474}
+  levelObjects: []
   <PopulationLimit>k__BackingField: 0
 --- !u!4 &508398862
 Transform:
@@ -397,8 +396,8 @@ MonoBehaviour:
         min: 0
         max: 0
       relativeScale:
-        min: 0
-        max: 0
+        min: 0.1
+        max: 0.1
       orbitRadius:
         min: 0
         max: 0
